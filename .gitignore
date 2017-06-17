@@ -1,0 +1,16 @@
+*.iml
+
+.DS_Store
+captures
+.externalNativeBuild
+
+
+.gradle/
+.idea/
+AWSMobileHelper/AWSMobileHelper.iml
+AWSMobileHelper/build/
+app/app.iml
+app/build/
+build/
+local.properties
+skoolevents.iml
