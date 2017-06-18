@@ -13,7 +13,7 @@ android {
     buildToolsVersion '25.0.2'
 
     defaultConfig {
-        applicationId "com.amazon.mysampleapp"
+        applicationId "com.skoolevents.eventapp"
         minSdkVersion 15
         targetSdkVersion 24
         versionCode 1
@@ -50,6 +50,8 @@ dependencies {
     compile 'com.android.support:multidex:1.0.0'
     compile 'com.google.code.gson:gson:2.7'
     compile project(':AWSMobileHelper')
+    compile 'com.android.support:design:25.2.0'
+    compile 'com.google.android.gms:play-services-appindexing:8.4.0'
 }
 
 repositories{
