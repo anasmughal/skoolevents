@@ -222,6 +222,7 @@ public class CreateActivity extends AppCompatActivity {
                 final DynamoDBMapper dynamoDBMapper = AWSMobileClient.defaultMobileClient().getDynamoDBMapper();
                 final SkooleventsDO firstItem = new SkooleventsDO(); // Initialize the Notes Object
 
+                firstItem.setSchool("jtms");
                 firstItem.setDate( (Double) new Long(eventDateTimeInEpoch).doubleValue() );
                 firstItem.setTitle(eventTitle);
                 firstItem.setDescription(eventDesc);
