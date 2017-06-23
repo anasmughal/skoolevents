@@ -3,6 +3,7 @@ package com.skoolevents.eventapp;
 import android.app.ListActivity;
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Layout;
@@ -81,7 +82,9 @@ public class MainActivity extends ListActivity {
 
 
 
-        fetchAWSDynamoDBData();
+        //fetchAWSDynamoDBData();
+
+        fetchAWSDynamoDBDataUsingAsyncTask();
 
     }
 
@@ -131,72 +134,203 @@ public class MainActivity extends ListActivity {
     }
 
 
+
+    boolean fetchAWSDynamoDBDataUsingAsyncTask() {
+
+        new LongOperation().execute(new String[] { "" });
+
+        return true;
+    }
+
+
+
+
+    /**
+     *
+     */
+    class AWSThread implements Runnable {
+
+
+        /** how many results to retrieve per service call. */
+        private static final int RESULTS_PER_RESULT_GROUP = 40;
+
+
+        public void run () {
+
+            try {
+                Log.v(LOG_TAG, "Before scanning dynamoDB");
+
+                final DynamoDBMapper dynamoDBMapper = AWSMobileClient.defaultMobileClient().getDynamoDBMapper();
+
+                final SkooleventsDO itemToFind = new SkooleventsDO();
+                itemToFind.setSchool("jtms");
+
+                /*final Condition rangeKeyCondition = new Condition()
+                        .withComparisonOperator(ComparisonOperator.LT.toString())
+                        .withAttributeValueList(new AttributeValue().withN(Double.toString(1496667610262)));*/
+                final DynamoDBQueryExpression<SkooleventsDO> queryExpression = new DynamoDBQueryExpression<SkooleventsDO>()
+                        .withHashKeyValues(itemToFind)
+                        //.withRangeKeyCondition("date", rangeKeyCondition)
+                        .withScanIndexForward(true)
+                        .withConsistentRead(false)
+                        .withLimit(RESULTS_PER_RESULT_GROUP);
+
+                PaginatedQueryList<SkooleventsDO> results = dynamoDBMapper.query(SkooleventsDO.class, queryExpression);
+
+                Log.v(LOG_TAG, "After executing query against dynamoDB");
+
+
+                if (results != null && results.size() != 0) {
+
+                    Iterator<SkooleventsDO> resultsIterator = results.iterator();
+                    while (resultsIterator.hasNext()) {
+                        SkooleventsDO se = resultsIterator.next();
+                        Log.v(LOG_TAG, "Found item : " + se.getDate() + ", " + se.getTitle() + ", " + se.getDescription());
+                    }
+
+                    Message msg = Message.obtain();
+                    msg.obj = results;
+                    handler.sendMessage(msg);
+
+                } else {
+                    Message msg = Message.obtain();
+                    msg.obj = null;
+                    handler.sendMessage(msg);
+                }
+
+
+            } catch (final AmazonClientException ex) {
+
+                Log.e(LOG_TAG, "Failed scanning for data : " + ex.getMessage(), ex);
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+
+            }
+        }
+
+    }
+
+
+    /**
+     *
+     */
+    private class LongOperation extends AsyncTask<String, Void, String> {
+
+        /** how many results to retrieve per service call. */
+        private static final int RESULTS_PER_RESULT_GROUP = 40;
+
+
+        PaginatedQueryList<SkooleventsDO> results = null;
+
+
+        /**
+         *
+         * @param params
+         * @return
+         */
+        @Override
+        protected String doInBackground(String... params) {
+
+            Log.v(LOG_TAG, "Before querying dynamoDB");
+
+            try {
+
+                final DynamoDBMapper dynamoDBMapper = AWSMobileClient.defaultMobileClient().getDynamoDBMapper();
+
+                final SkooleventsDO itemToFind = new SkooleventsDO();
+                itemToFind.setSchool("jtms");
+
+                /*final Condition rangeKeyCondition = new Condition()
+                        .withComparisonOperator(ComparisonOperator.LT.toString())
+                        .withAttributeValueList(new AttributeValue().withN(Double.toString(1496667610262)));*/
+                final DynamoDBQueryExpression<SkooleventsDO> queryExpression = new DynamoDBQueryExpression<SkooleventsDO>()
+                        .withHashKeyValues(itemToFind)
+                        //.withRangeKeyCondition("date", rangeKeyCondition)
+                        .withScanIndexForward(true)
+                        .withConsistentRead(false)
+                        .withLimit(RESULTS_PER_RESULT_GROUP);
+
+                results = dynamoDBMapper.query(SkooleventsDO.class, queryExpression);
+
+                Log.v(LOG_TAG, "After executing query against dynamoDB");
+
+
+            } catch (final AmazonClientException ex) {
+
+                Log.e(LOG_TAG, "Failed scanning for data : " + ex.getMessage(), ex);
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+
+            }
+
+
+            return "Executed";
+        }
+
+
+        /**
+         *
+         * @param result
+         */
+        @Override
+        protected void onPostExecute(String result) {
+
+            Log.v("@@@", ">>>>>>>>>>>>>>>>>>>>>>>> Handle Message >>>>>>>>>>>>>" );
+
+
+            if (results != null && results.size() != 0) {
+                // Just to get log output
+                Iterator<SkooleventsDO> resultsIterator = results.iterator();
+                ArrayList<SkooleventsDO> eventList = new ArrayList<SkooleventsDO>();
+
+                while (resultsIterator.hasNext()) {
+                    SkooleventsDO se = resultsIterator.next();
+                    Log.v(LOG_TAG + "_H", "Found item : " + se.getDate() + ", " + se.getTitle() + ", " + se.getDescription());
+
+                    SkooleventsDO event = new SkooleventsDO();
+                    event.setDate(se.getDate());
+                    event.setDescription(se.getDescription());
+                    event.setTitle(se.getTitle());
+                    eventList.add(event);
+                }
+
+                ArrayAdapter<Property> adapter = new com.skoolevents.eventapp.EventArrayAdapter(getListView().getContext(), 0, eventList);
+                ListView listView = (ListView) findViewById(android.R.id.list);
+                listView.setAdapter(adapter);
+
+            } else {
+                showNoEventsMessage();
+            }
+
+
+        }
+
+
         /**
          *
          */
-        class AWSThread implements Runnable {
+        @Override
+        protected void onPreExecute() {}
 
 
-            /** how many results to retrieve per service call. */
-            private static final int RESULTS_PER_RESULT_GROUP = 40;
-
-
-            public void run () {
-
-                try {
-                    Log.v(LOG_TAG, "Before scanning dynamoDB");
-
-                    final DynamoDBMapper dynamoDBMapper = AWSMobileClient.defaultMobileClient().getDynamoDBMapper();
-
-                    final SkooleventsDO itemToFind = new SkooleventsDO();
-                    itemToFind.setSchool("jtms");
-
-                    /*final Condition rangeKeyCondition = new Condition()
-                            .withComparisonOperator(ComparisonOperator.LT.toString())
-                            .withAttributeValueList(new AttributeValue().withN(Double.toString(1496667610262)));*/
-                    final DynamoDBQueryExpression<SkooleventsDO> queryExpression = new DynamoDBQueryExpression<SkooleventsDO>()
-                            .withHashKeyValues(itemToFind)
-                            //.withRangeKeyCondition("date", rangeKeyCondition)
-                            .withScanIndexForward(true)
-                            .withConsistentRead(false)
-                            .withLimit(RESULTS_PER_RESULT_GROUP);
-
-                    PaginatedQueryList<SkooleventsDO> results = dynamoDBMapper.query(SkooleventsDO.class, queryExpression);
-
-                    Log.v(LOG_TAG, "After executing query against dynamoDB");
-
-
-                    if (results != null && results.size() != 0) {
-
-                        Iterator<SkooleventsDO> resultsIterator = results.iterator();
-                        while (resultsIterator.hasNext()) {
-                            SkooleventsDO se = resultsIterator.next();
-                            Log.v(LOG_TAG, "Found item : " + se.getDate() + ", " + se.getTitle() + ", " + se.getDescription());
-                        }
-
-                        Message msg = Message.obtain();
-                        msg.obj = results;
-                        handler.sendMessage(msg);
-
-                    } else {
-                        Message msg = Message.obtain();
-                        msg.obj = null;
-                        handler.sendMessage(msg);
-                    }
-
-
-                } catch (final AmazonClientException ex) {
-
-                    Log.e(LOG_TAG, "Failed scanning for data : " + ex.getMessage(), ex);
-
-                } catch (Exception e) {
-
-                    e.printStackTrace();
-
-                }
-            }
-
+        /**
+         *
+         * @param values
+         */
+        @Override
+        protected void onProgressUpdate(Void... values) {}
     }
+
+
+
+
+
+
+
 
 
 
