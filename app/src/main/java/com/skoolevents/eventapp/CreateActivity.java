@@ -19,10 +19,7 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.mobile.AWSMobileClient;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.amazonaws.models.nosql.SkooleventsDO;
-//import com.google.android.gms.appindexing.Action;
-//import com.google.android.gms.appindexing.AppIndex;
-//import com.google.android.gms.appindexing.Thing;
-//import com.google.android.gms.common.api.GoogleApiClient;
+
 import com.skoolevents.eventapp.R;
 
 import java.util.Calendar;
@@ -33,12 +30,14 @@ import static android.text.TextUtils.isEmpty;
 //import static com.skoolevents.eventapp.R.id.date;
 
 
+
 /**
  *
  */
 public class CreateActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "SchoolEventsCreate";
+
 
 
     // >>>>>>>>>>>>>>>>>>>>>>>>
@@ -140,21 +139,14 @@ public class CreateActivity extends AppCompatActivity {
 
 
 
-
-
     private EditText nameField, descField, passwordField;
     private String eventTitle, eventDesc, passwordString;
 
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    //private GoogleApiClient client;
 
 
     /**
-     * 
+     *
      * @param savedInstanceState
      */
     @Override
@@ -274,11 +266,6 @@ public class CreateActivity extends AppCompatActivity {
         });
 
 
-
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        //client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
 
