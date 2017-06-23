@@ -96,10 +96,10 @@ public class CreateActivity extends AppCompatActivity {
 
 
 
+    // >>>>>>>>>>>>>>>>>>>>>>>>
+    // >>> Time Logic START >>>
+    // >>>>>>>>>>>>>>>>>>>>>>>>
 
-    // end of date code
-
-    // start of time code
     Button buttonstpd;
     static final int TIME_DIALOG_ID = 20;
     int hour_x;
@@ -134,8 +134,9 @@ public class CreateActivity extends AppCompatActivity {
                 }
             };
 
-
-    // end of time code
+    // <<<<<<<<<<<<<<<<<<<<<<
+    // <<< Time Logic END <<<
+    // <<<<<<<<<<<<<<<<<<<<<<
 
 
 
@@ -143,7 +144,7 @@ public class CreateActivity extends AppCompatActivity {
 
     private EditText nameField, descField, passwordField;
     private String eventTitle, eventDesc, passwordString;
-    //private Date eventDate;
+
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -151,6 +152,11 @@ public class CreateActivity extends AppCompatActivity {
      */
     //private GoogleApiClient client;
 
+
+    /**
+     * 
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 

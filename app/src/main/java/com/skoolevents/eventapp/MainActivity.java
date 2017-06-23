@@ -93,8 +93,6 @@ public class MainActivity extends ListActivity {
         //client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
 
-        //showLoadingMessage();
-
         fetchAWSDynamoDBData();
 
     }
@@ -134,6 +132,7 @@ public class MainActivity extends ListActivity {
                     ArrayAdapter<Property> adapter = new com.skoolevents.eventapp.EventArrayAdapter(getListView().getContext(), 0, eventList);
                     ListView listView = (ListView) findViewById(android.R.id.list);
                     listView.setAdapter(adapter);
+
                 } else {
                     showNoEventsMessage();
                 }
@@ -153,8 +152,6 @@ public class MainActivity extends ListActivity {
             /** how many results to retrieve per service call. */
             private static final int RESULTS_PER_RESULT_GROUP = 40;
 
-            //private Iterator<SkooleventsDO> resultsIterator;
-
 
             public void run () {
 
@@ -162,32 +159,6 @@ public class MainActivity extends ListActivity {
                     Log.v(LOG_TAG, "Before scanning dynamoDB");
 
                     final DynamoDBMapper dynamoDBMapper = AWSMobileClient.defaultMobileClient().getDynamoDBMapper();
-                    //final DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
-
-                    /*
-                    Reply replyKey = new Reply();
-                    replyKey.setId("1493535646759");
-
-                    DynamoDBQueryExpression<SkooleventsDO> queryExpression = new DynamoDBQueryExpression<SkooleventsDO>();
-
-                    PaginatedQueryList<SkooleventsDO> results = dynamoDBMapper.query(SkooleventsDO.class, queryExpression);
-                    */
-
-                    /*
-                     *   http://stackoverflow.com/questions/30840093/how-to-do-query-in-dynamodb-on-the-basis-of-hashkey-and-range-key
-                     *
-                     *   this is what we need to do:
-                     *
-                     *   http://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Query.html#DDB-Query-request-KeyConditionExpression
-                     *
-                     */
-
-                    //PaginatedScanList<SkooleventsDO> results ;//= dynamoDBMapper.scan(SkooleventsDO.class, scanExpression);
-
-
-
-
-
 
                     final SkooleventsDO itemToFind = new SkooleventsDO();
                     itemToFind.setSchool("jtms");
@@ -207,18 +178,7 @@ public class MainActivity extends ListActivity {
                     Log.v(LOG_TAG, "After executing query against dynamoDB");
 
 
-                    /*if (results != null) {
-                        Iterator<SkooleventsDO> resultsIterator = results.iterator();
-                        if (resultsIterator.hasNext()) {
-                            return true;
-                        }
-                    }*/
-
-
-
                     if (results != null && results.size() != 0) {
-
-                        //results.sort(new EventComparator());
 
                         Iterator<SkooleventsDO> resultsIterator = results.iterator();
                         while (resultsIterator.hasNext()) {
@@ -238,12 +198,13 @@ public class MainActivity extends ListActivity {
 
 
                 } catch (final AmazonClientException ex) {
+
                     Log.e(LOG_TAG, "Failed scanning for data : " + ex.getMessage(), ex);
-                    //lastException = ex;
+
                 } catch (Exception e) {
-                    {
-                        e.printStackTrace();
-                    }
+
+                    e.printStackTrace();
+
                 }
             }
 
@@ -253,7 +214,7 @@ public class MainActivity extends ListActivity {
 
 
     /**
-     *
+     * sample data -- not used anymore
      */
     void populateItems() {
 
@@ -269,24 +230,6 @@ public class MainActivity extends ListActivity {
 
     }
 
-
-
-    /**
-     *
-     */
-    void showLoadingMessage() {
-
-        String[] myitems = { "Loading events..." };
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                getListView().getContext(),
-                android.R.layout.simple_list_item_1,
-                myitems
-        );
-
-        getListView().setAdapter(adapter);
-
-    }
 
 
     /**
@@ -379,10 +322,7 @@ public class MainActivity extends ListActivity {
         //Intent homeIntent = new Intent(MainActivity.this, activity_create.class);
         //MainActivity.this.startActivity(homeIntent);
 
-        Log.v("ahleo", "sowel");
-
-
-
+        Log.v("Hello", "inside createScreen");
 
     }
 
