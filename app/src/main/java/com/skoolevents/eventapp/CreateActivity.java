@@ -153,6 +153,9 @@ public class CreateActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        Log.v("@@@ >>>", "CreateActivity::onCreate -- >>>>>>>>>>>>>>>");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
         // next 6 lines are for date code
@@ -167,13 +170,12 @@ public class CreateActivity extends AppCompatActivity {
         showTimePickerDialog();
 
 
-
-        Log.v("@@@ >>>", "CreateActivity::onCreate -- >>>>>>>>>>>>>>>");
-
-
         android.widget.Button add = (android.widget.Button) findViewById(R.id.submitEventButton);
+
+
         add.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
+
+            public void onClick(final View view) {
 
                 Log.v("@@@ >>>", "CreateActivity::onCreate -- add.setOnClickListener()" );
 
@@ -228,12 +230,18 @@ public class CreateActivity extends AppCompatActivity {
                 firstItem.setDescription(eventDesc);
 
 
+                /**
+                 * Declare thread to handle saving to dynamoDB
+                 */
                 Thread thread = new Thread(new Runnable() {
 
                     @Override
                     public void run() {
+
                         try  {
+
                             dynamoDBMapper.save(firstItem);
+
                         } catch (final AmazonClientException ex) {
                             Log.e(LOG_TAG, "Failed saving item : " + ex.getMessage(), ex);
                             //lastException = ex;
@@ -241,16 +249,22 @@ public class CreateActivity extends AppCompatActivity {
                         catch (Exception e) {
                             e.printStackTrace();
                         }
+
+
+                        // Now switch to main view
+
+                        Intent mainIntent = new Intent(view.getContext(), com.skoolevents.eventapp.MainActivity.class);
+                        startActivityForResult(mainIntent, 0);
+
                     }
                 });
+
 
                 thread.start();
 
 
-
-                Intent mainIntent = new Intent(view.getContext(), com.skoolevents.eventapp.MainActivity.class);
-                startActivityForResult(mainIntent, 0);
             }
+
         });
 
 
