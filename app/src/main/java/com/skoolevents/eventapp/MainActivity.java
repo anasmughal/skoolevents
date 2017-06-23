@@ -29,6 +29,9 @@ import com.amazonaws.models.nosql.SkooleventsDO;
 //import com.google.android.gms.appindexing.AppIndex;
 //import com.google.android.gms.appindexing.Thing;
 //import com.google.android.gms.common.api.GoogleApiClient;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
+import com.amazonaws.services.dynamodbv2.model.Condition;
 import com.skoolevents.eventapp.R;
 
 import java.util.ArrayList;
@@ -111,7 +114,7 @@ public class MainActivity extends ListActivity {
                 Log.v("@@@", ">>>>>>>>>>>>>>>>>>>>>>>> Handle Message >>>>>>>>>>>>>" + msg.obj);
 
 
-                PaginatedScanList<SkooleventsDO> results = (PaginatedScanList<SkooleventsDO>) msg.obj;
+                PaginatedQueryList<SkooleventsDO> results = (PaginatedQueryList<SkooleventsDO>) msg.obj;
                 if (results != null) {
                     // Just to get log output
                     Iterator<SkooleventsDO> resultsIterator = results.iterator();
@@ -146,13 +149,20 @@ public class MainActivity extends ListActivity {
          */
         class AWSThread implements Runnable {
 
+
+            /** how many results to retrieve per service call. */
+            private static final int RESULTS_PER_RESULT_GROUP = 40;
+
+            //private Iterator<SkooleventsDO> resultsIterator;
+
+
             public void run () {
 
                 try {
                     Log.v(LOG_TAG, "Before scanning dynamoDB");
 
                     final DynamoDBMapper dynamoDBMapper = AWSMobileClient.defaultMobileClient().getDynamoDBMapper();
-                    final DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+                    //final DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
 
                     /*
                     Reply replyKey = new Reply();
@@ -172,13 +182,41 @@ public class MainActivity extends ListActivity {
                      *
                      */
 
+                    //PaginatedScanList<SkooleventsDO> results ;//= dynamoDBMapper.scan(SkooleventsDO.class, scanExpression);
 
 
-                    PaginatedScanList<SkooleventsDO> results = dynamoDBMapper.scan(SkooleventsDO.class, scanExpression);
-                    Log.v(LOG_TAG, "After scanning dynamoDB");
 
 
-                    if (results != null) {
+
+
+                    final SkooleventsDO itemToFind = new SkooleventsDO();
+                    itemToFind.setSchool("jtms");
+
+                    /*final Condition rangeKeyCondition = new Condition()
+                            .withComparisonOperator(ComparisonOperator.LT.toString())
+                            .withAttributeValueList(new AttributeValue().withN(Double.toString(1496667610262)));*/
+                    final DynamoDBQueryExpression<SkooleventsDO> queryExpression = new DynamoDBQueryExpression<SkooleventsDO>()
+                            .withHashKeyValues(itemToFind)
+                            //.withRangeKeyCondition("date", rangeKeyCondition)
+                            .withScanIndexForward(true)
+                            .withConsistentRead(false)
+                            .withLimit(RESULTS_PER_RESULT_GROUP);
+
+                    PaginatedQueryList<SkooleventsDO> results = dynamoDBMapper.query(SkooleventsDO.class, queryExpression);
+
+                    Log.v(LOG_TAG, "After executing query against dynamoDB");
+
+
+                    /*if (results != null) {
+                        Iterator<SkooleventsDO> resultsIterator = results.iterator();
+                        if (resultsIterator.hasNext()) {
+                            return true;
+                        }
+                    }*/
+
+
+
+                    if (results != null && results.size() != 0) {
 
                         //results.sort(new EventComparator());
 
